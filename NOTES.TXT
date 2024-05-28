@@ -1,0 +1,3 @@
+Max Width:
+    max-w-[1200px]
+Note: This is to make sure yang semua content berada kat tengah dan tak terlalu ke kiri or kanan (If laptop is too big, dia akan ke kanan sgt. Not good)
