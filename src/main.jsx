@@ -5,10 +5,12 @@ import './index.css';
 
 import Login from './Pages/Login_Register/Login';
 import Register from './Pages/Login_Register/Register';
+import User_Dashboard from './Components/Pages_Based/User_Dashboard/User_Dashboard';
 
 const routes = [
   { path: '/', element: <Login /> },
   { path: '/register', element: <Register /> },
+  { path: '/user-dashboard', element: <User_Dashboard /> },
 
 ];
 

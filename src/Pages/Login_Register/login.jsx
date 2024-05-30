@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import LoginRegisterHeader from "../../Components/Pages_Based/Login_Register/LoginRegisterHeader";
 import InputField from "../../Components/Global/InputField";
 import MediumButton from "../../Components/Global/MediumButton";
@@ -7,6 +7,7 @@ import MediumButton from "../../Components/Global/MediumButton";
 export default function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate(); // Move useNavigate hook outside of the function
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -21,8 +22,8 @@ export default function Login() {
 
         const data = await response.json();
         if (response.ok) {
-            alert('Login successful');
-            // Here you could redirect the user or set the user in context/state
+            localStorage.setItem('username', username); // Store username in local storage
+            navigate('/user-dashboard');
         } else {
             alert(`Error: ${data.error}`);
         }

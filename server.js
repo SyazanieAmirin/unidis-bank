@@ -31,18 +31,32 @@ const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE, (err) => {
     }
 });
 
+
 // Route to handle user registration
 app.post('/api/register', (req, res) => {
     const { name, password } = req.body;
-    const sql = 'INSERT INTO users (name, password) VALUES (?, ?)';
-    db.run(sql, [name, password], function (err) {
+
+    if (!name || !password) {
+        res.status(400).json({ error: 'Name and password are required' });
+        return;
+    }
+
+    const accountNumber = generateAccountNumber();
+
+    // Log the generated account number for debugging
+    console.log('Generated Account Number:', accountNumber);
+
+    const sql = 'INSERT INTO users (name, password, account_number) VALUES (?, ?, ?)';
+    db.run(sql, [name, password, accountNumber], function (err) {
         if (err) {
+            console.error('Error inserting into database:', err.message);
             res.status(400).json({ error: err.message });
             return;
         }
         res.json({ message: 'User registered', id: this.lastID });
     });
 });
+
 
 // Route to handle user login
 app.post('/api/login', (req, res) => {
@@ -60,6 +74,42 @@ app.post('/api/login', (req, res) => {
         }
     });
 });
+
+// Route to handle fetching user data by ID
+app.get('/api/users/:name', (req, res) => {
+    const userName = req.params.name;
+    const sql = 'SELECT id FROM users WHERE name = ?';
+    db.get(sql, [userName], (err, row) => {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        if (row) {
+            res.json(row);
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    });
+});
+
+// Route to handle fetching user name by ID
+app.get('/api/user/:id', (req, res) => {
+    const userId = req.params.id;
+    const sql = 'SELECT name FROM users WHERE id = ?';
+    db.get(sql, [userId], (err, row) => {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        if (row) {
+            res.json(row);
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    });
+});
+
+
 
 // Start the server and listen on the specified port
 app.listen(port, () => {

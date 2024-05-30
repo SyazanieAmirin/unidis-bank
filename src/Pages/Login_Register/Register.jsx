@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import LoginRegisterHeader from "../../Components/Pages_Based/Login_Register/LoginRegisterHeader";
 import InputField from "../../Components/Global/InputField";
 import MediumButton from "../../Components/Global/MediumButton";
@@ -8,6 +8,8 @@ export default function Register() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const navigate = useNavigate(); // Move useNavigate hook outside of the function
+
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -26,7 +28,8 @@ export default function Register() {
 
         const data = await response.json();
         if (response.ok) {
-            alert('User registered successfully');
+            localStorage.setItem('username', username); // Store username in local storage
+            navigate('/user-dashboard');
         } else {
             alert(`Error: ${data.error}`);
         }
