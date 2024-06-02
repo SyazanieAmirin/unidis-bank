@@ -1,3 +1,1 @@
 DROP TABLE IF EXISTS transactions;
-DROP TABLE IF EXISTS widthdraw;
-DROP TABLE IF EXISTS transfer;

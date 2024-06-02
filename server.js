@@ -55,11 +55,16 @@ app.post('/api/register', (req, res) => {
     // Log the generated account number for debugging
     console.log('Generated Account Number:', accountNumber);
 
-    const sql = 'INSERT INTO users (name, password, account_number) VALUES (?, ?, ?)';
-    db.run(sql, [name, password, accountNumber], function (err) {
+    const insertUserSql = 'INSERT INTO users (name, password, account_number) VALUES (?, ?, ?)';
+    db.run(insertUserSql, [name, password, accountNumber], function (err) {
         if (err) {
-            console.error('Error inserting into database:', err.message);
-            res.status(400).json({ error: err.message });
+            if (err.code === 'SQLITE_CONSTRAINT') {
+                // Handle unique constraint violation
+                res.status(400).json({ error: 'Username already exists' });
+            } else {
+                console.error('Error inserting into database:', err.message);
+                res.status(500).json({ error: 'Internal server error' });
+            }
             return;
         }
         res.json({ message: 'User registered', id: this.lastID });
@@ -84,10 +89,10 @@ app.post('/api/login', (req, res) => {
     });
 });
 
-// Route to handle fetching user data by ID
+// Route to handle fetching user data by name
 app.get('/api/users/:name', (req, res) => {
     const userName = req.params.name;
-    const sql = 'SELECT id FROM users WHERE name = ?';
+    const sql = 'SELECT account_number FROM users WHERE name = ?';
     db.get(sql, [userName], (err, row) => {
         if (err) {
             res.status(400).json({ error: err.message });
@@ -100,6 +105,7 @@ app.get('/api/users/:name', (req, res) => {
         }
     });
 });
+
 
 // Route to handle fetching user name by ID
 app.get('/api/user/:id', (req, res) => {
@@ -118,6 +124,23 @@ app.get('/api/user/:id', (req, res) => {
     });
 });
 
+
+// Route to handle fetching transactions for a specific user
+app.get('/api/user/:id/transactions', (req, res) => {
+    const userId = req.params.id;
+    const sql = 'SELECT * FROM transactions WHERE user_id = ?';
+    db.all(sql, [userId], (err, rows) => {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        if (rows.length > 0) {
+            res.json(rows);
+        } else {
+            res.status(404).json({ error: 'Transactions not found for this user' });
+        }
+    });
+});
 
 
 // Start the server and listen on the specified port

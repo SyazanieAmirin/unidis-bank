@@ -18,20 +18,25 @@ export default function Register() {
             return;
         }
 
-        const response = await fetch('http://localhost:3001/api/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ name: username, password: password }),
-        });
+        try {
+            const response = await fetch('http://localhost:3001/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name: username, password: password }),
+            });
 
-        const data = await response.json();
-        if (response.ok) {
-            localStorage.setItem('username', username); // Store username in local storage
-            navigate('/user-dashboard');
-        } else {
-            alert(`Error: ${data.error}`);
+            const data = await response.json();
+            if (response.ok) {
+                localStorage.setItem('username', username); // Store username in local storage
+                navigate('/user-dashboard');
+            } else {
+                alert(`Error: ${data.error}`);
+            }
+        } catch (error) {
+            console.error('Error during registration:', error);
+            alert('An error occurred during registration. Please try again later.');
         }
     };
 
