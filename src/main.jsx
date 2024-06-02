@@ -5,7 +5,7 @@ import './index.css';
 
 import Login from './Pages/Login_Register/Login';
 import Register from './Pages/Login_Register/Register';
-import User_Dashboard from './Components/Pages_Based/User_Dashboard/User_Dashboard';
+import User_Dashboard from './Pages/User_Dashboard/User_Dashboard';
 
 const routes = [
   { path: '/', element: <Login /> },

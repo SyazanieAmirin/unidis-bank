@@ -31,7 +31,6 @@ const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE, (err) => {
     }
 });
 
-
 // Route to handle user registration
 app.post('/api/register', (req, res) => {
     const { name, password } = req.body;
@@ -41,7 +40,17 @@ app.post('/api/register', (req, res) => {
         return;
     }
 
-    const accountNumber = generateAccountNumber();
+    // Function to generate a random 12-digit account number
+    function generateAccountNumber() {
+        let accountNumber = '';
+        for (let i = 0; i < 12; i++) {
+            // Generate a random digit (0-9) and append it to the account number string
+            accountNumber += Math.floor(Math.random() * 10);
+        }
+        return accountNumber;
+    }
+
+    let accountNumber = generateAccountNumber();
 
     // Log the generated account number for debugging
     console.log('Generated Account Number:', accountNumber);
