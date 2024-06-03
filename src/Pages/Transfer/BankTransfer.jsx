@@ -91,9 +91,11 @@ export default function BankTransfer() {
                 isShowTitle={true}
                 title="Receipient’s Account Number"
                 placeholder="Input the receipient’s account number here."
-                type="text"
+                type="number"
                 value={recipientAccountNumber}
                 onChange={(e) => setRecipientAccountNumber(e.target.value)}
+                limitMax={10}
+                limitMin={1}
             />
             <InputField
                 isShowTitle={true}
