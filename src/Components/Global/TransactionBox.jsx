@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export default function RecentTransactionsBox({ title, userName }) {
+export default function TransactionBox({ title, userName }) {
     const [transactions, setTransactions] = useState([]);
 
     useEffect(() => {
@@ -15,12 +15,7 @@ export default function RecentTransactionsBox({ title, userName }) {
                 const transactionsResponse = await fetch(`http://localhost:3001/api/user/${userId}/transactions`);
                 const transactionsData = await transactionsResponse.json();
 
-                // Sort transactions by date and slice to get the 5 most recent transactions
-                const recentTransactions = transactionsData
-                    .sort((a, b) => new Date(b.transaction_date) - new Date(a.transaction_date))
-                    .slice(0, 5); // TO CHANGE LIMIT, ITS HERE
-
-                setTransactions(recentTransactions);
+                setTransactions(transactionsData);
             } catch (error) {
                 console.error('Error fetching transactions:', error);
             }
@@ -32,7 +27,7 @@ export default function RecentTransactionsBox({ title, userName }) {
     return (
         <>
 
-            <div className="bg-black h-auto w-1/2 rounded-md flex flex-col px-7 py-4 gap-3">
+            <div className="bg-black h-auto w-1/2 rounded-md flex flex-col px-7 py-4 gap-3 max-h-96 overflow-y-auto">
                 <h1 className="font-bold text-white">{title}</h1>
                 {transactions.length > 0 ? (
                     transactions.map((transaction) => (

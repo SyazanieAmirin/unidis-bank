@@ -5,5 +5,7 @@ CREATE TABLE transactions (
     transaction_type TEXT NOT NULL, -- Type of transaction ('withdrawal', 'transfer_in', 'transfer_out')
     transaction_date DATE NOT NULL, -- Date of the transaction
     target_name TEXT,          -- Name of the target user, NULL for withdrawals
+    target_account_number TEXT,          -- Name of the target user, NULL for withdrawals
+    bank_name TEXT,          -- Name of the target user, NULL for withdrawals
     FOREIGN KEY (user_id) REFERENCES users(id)
 );

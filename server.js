@@ -159,6 +159,32 @@ app.get('/api/userId/:name', (req, res) => {
     });
 });
 
+// Route to handle bank transfer
+app.post('/api/transfer', (req, res) => {
+    const { userId, amount, recipientName, recipientAccountNumber, bankName } = req.body;
+
+    if (!userId || !amount || !recipientName || !recipientAccountNumber || !bankName) {
+        res.status(400).json({ error: 'All fields are required' });
+        return;
+    }
+
+    const transactionType = 'transfer';
+    const transactionDate = new Date().toISOString().split('T')[0];
+
+    const insertTransactionSql = `
+        INSERT INTO transactions (user_id, amount, transaction_type, transaction_date, target_name, target_account_number, bank_name)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    db.run(insertTransactionSql, [userId, amount, transactionType, transactionDate, recipientName, recipientAccountNumber, bankName], function (err) {
+        if (err) {
+            console.error('Error inserting transaction:', err.message);
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+        }
+        res.json({ message: 'Transaction successful', transactionId: this.lastID });
+    });
+});
 
 
 

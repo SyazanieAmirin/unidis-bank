@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import Header from '../../Components/Global/Header';
-import RecentTransactionsBox from '../../Components/Global/RecentTransactionsBox';
-import BigButton from '../../Components/Global/BigButton';
+import TransactionBox from '../../Components/Global/TransactionBox';
 
-export default function User_Dashboard() {
+export default function AccountSummary() {
     const [username, setUsername] = useState('');
-    const [accountNumber, setAccountNumber] = useState('');
 
+    const [accountNumber, setAccountNumber] = useState('');
 
     useEffect(() => {
         const storedUsername = localStorage.getItem('username');
@@ -31,13 +30,11 @@ export default function User_Dashboard() {
 
     return (
         <div className="flex flex-col items-center py-5 w-full max-w-[1200px] m-auto">
-            <Header current_page={"Home"} />
-            <h1 className="mt-14 font-bold text-xl">Welcome, {username}</h1>
+            <Header current_page={"Account Summary"} />
+            <br></br><br></br>
             <h1>{accountNumber}</h1>
             <br></br>
-            <RecentTransactionsBox title={"Recent Transactions"} userName={username} />
-            <br></br><br></br>
-            <BigButton title="Contact Customer Support" onClick={() => alert('Contact this number: 0174577406')} />
+            <TransactionBox title={"All Transactions"} userName={username} />
         </div>
-    );
+    )
 }

@@ -6,11 +6,17 @@ import './index.css';
 import Login from './Pages/Login_Register/Login';
 import Register from './Pages/Login_Register/Register';
 import User_Dashboard from './Pages/User_Dashboard/User_Dashboard';
+import AccountSummary from './Pages/Account_Summary/AccountSummary';
+import Transfer from './Pages/Transfer/Transfer';
+import BankTransfer from './Pages/Transfer/BankTransfer';
 
 const routes = [
   { path: '/', element: <Login /> },
   { path: '/register', element: <Register /> },
   { path: '/user-dashboard', element: <User_Dashboard /> },
+  { path: '/account-summary', element: <AccountSummary /> },
+  { path: '/transfer', element: <Transfer /> },
+  { path: '/transfer/bank-transfer', element: <BankTransfer /> },
 
 ];
 
