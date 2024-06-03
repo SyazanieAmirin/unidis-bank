@@ -124,11 +124,10 @@ app.get('/api/user/:id', (req, res) => {
     });
 });
 
-
 // Route to handle fetching transactions for a specific user
 app.get('/api/user/:id/transactions', (req, res) => {
     const userId = req.params.id;
-    const sql = 'SELECT * FROM transactions WHERE user_id = ?';
+    const sql = 'SELECT * FROM transactions WHERE user_id = ? ORDER BY transaction_date DESC';
     db.all(sql, [userId], (err, rows) => {
         if (err) {
             res.status(400).json({ error: err.message });
@@ -141,6 +140,26 @@ app.get('/api/user/:id/transactions', (req, res) => {
         }
     });
 });
+
+
+// Route to handle fetching user ID by name
+app.get('/api/userId/:name', (req, res) => {
+    const userName = req.params.name;
+    const sql = 'SELECT id FROM users WHERE name = ?';
+    db.get(sql, [userName], (err, row) => {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        if (row) {
+            res.json(row);
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    });
+});
+
+
 
 
 // Start the server and listen on the specified port

@@ -34,7 +34,7 @@ export default function User_Dashboard() {
             <h1 className="mt-14 font-bold">Welcome, {username}</h1>
             <h1>{accountNumber}</h1>
             <br></br><br></br>
-            <RecentTransactionsBox title={"Recent Transactions"} />
+            <RecentTransactionsBox title={"Recent Transactions"} userName={username} />
         </div>
     );
 }
