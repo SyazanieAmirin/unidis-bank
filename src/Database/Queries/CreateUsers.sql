@@ -2,5 +2,6 @@ CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
-    account_number TEXT NOT NULL
+    account_number TEXT NOT NULL,
+    money_in_bank NUMERIC NOT NULL
 );

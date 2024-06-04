@@ -85,7 +85,7 @@ export default function BankTransfer() {
                 placeholder="Input the receipient’s (receiver) name here"
                 type="text"
                 value={recipientName}
-                onChange={(e) => setRecipientName(e.target.value)}
+                onChange={(e) => setRecipientName(e.target.value.toUpperCase())}
             />
             <InputField
                 isShowTitle={true}

@@ -6,7 +6,7 @@ import BigButton from '../../Components/Global/BigButton';
 export default function User_Dashboard() {
     const [username, setUsername] = useState('');
     const [accountNumber, setAccountNumber] = useState('');
-
+    const [moneyInBank, setMoneyInBank] = useState(0);
 
     useEffect(() => {
         const storedUsername = localStorage.getItem('username');
@@ -23,6 +23,7 @@ export default function User_Dashboard() {
             .then(data => {
                 // Set the account number state
                 setAccountNumber(data.account_number);
+                setMoneyInBank(data.money_in_bank);
             })
             .catch(error => {
                 console.error('Error fetching user data:', error);
@@ -34,6 +35,7 @@ export default function User_Dashboard() {
             <Header current_page={"Home"} />
             <h1 className="mt-14 font-bold text-xl">Welcome, {username}</h1>
             <h1>{accountNumber}</h1>
+            <h1 className="mt-2 font-bold text-2xl">RM{moneyInBank.toFixed(2)}</h1>
             <br></br>
             <RecentTransactionsBox title={"Recent Transactions"} userName={username} />
             <br></br><br></br>

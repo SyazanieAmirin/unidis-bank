@@ -55,7 +55,7 @@ app.post('/api/register', (req, res) => {
     // Log the generated account number for debugging
     console.log('Generated Account Number:', accountNumber);
 
-    const insertUserSql = 'INSERT INTO users (name, password, account_number) VALUES (?, ?, ?)';
+    const insertUserSql = 'INSERT INTO users (name, password, account_number, money_in_bank) VALUES (?, ?, ?, 0)';
     db.run(insertUserSql, [name, password, accountNumber], function (err) {
         if (err) {
             if (err.code === 'SQLITE_CONSTRAINT') {
@@ -92,7 +92,7 @@ app.post('/api/login', (req, res) => {
 // Route to handle fetching user data by name
 app.get('/api/users/:name', (req, res) => {
     const userName = req.params.name;
-    const sql = 'SELECT account_number FROM users WHERE name = ?';
+    const sql = 'SELECT account_number, money_in_bank FROM users WHERE name = ?';
     db.get(sql, [userName], (err, row) => {
         if (err) {
             res.status(400).json({ error: err.message });
