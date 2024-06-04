@@ -9,6 +9,7 @@ import User_Dashboard from './Pages/User_Dashboard/User_Dashboard';
 import AccountSummary from './Pages/Account_Summary/AccountSummary';
 import Transfer from './Pages/Transfer/Transfer';
 import BankTransfer from './Pages/Transfer/BankTransfer';
+import DuitNow from './Pages/Transfer/DuitNow';
 
 const routes = [
   { path: '/', element: <Login /> },
@@ -17,6 +18,7 @@ const routes = [
   { path: '/account-summary', element: <AccountSummary /> },
   { path: '/transfer', element: <Transfer /> },
   { path: '/transfer/bank-transfer', element: <BankTransfer /> },
+  { path: '/transfer/duitnow', element: <DuitNow /> },
 
 ];
 

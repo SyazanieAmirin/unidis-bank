@@ -10,6 +10,7 @@ export default function BankTransfer() {
     const [userId, setUserId] = useState(null); // To store the user ID
     const [username, setUsername] = useState('');
     const bankName = 'Unidis Bank'; // Since the bank name is fixed
+    const [moneyInBank, setMoneyInBank] = useState(0);
 
     useEffect(() => {
         const storedUsername = localStorage.getItem('username');
@@ -20,6 +21,25 @@ export default function BankTransfer() {
                 const response = await fetch(`http://localhost:3001/api/userId/${storedUsername}`);
                 const data = await response.json();
                 setUserId(data.id);
+            } catch (error) {
+                console.error('Error fetching user ID:', error);
+            }
+        };
+
+        if (storedUsername) {
+            fetchUserId();
+        }
+    }, []);
+
+    useEffect(() => {
+        const storedUsername = localStorage.getItem('username');
+        setUsername(storedUsername);
+
+        const fetchUserId = async () => {
+            try {
+                const response = await fetch(`http://localhost:3001/api/users/${storedUsername}`);
+                const data = await response.json();
+                setMoneyInBank(data.money_in_bank);
             } catch (error) {
                 console.error('Error fetching user ID:', error);
             }
@@ -67,10 +87,12 @@ export default function BankTransfer() {
     };
 
     return (
-        <div className="flex flex-col items-center py-5 w-full max-w-[1200px] m-auto">
+        <div class="flex flex-col items-center py-5 w-full max-w-[1200px] m-auto">
             <Header current_page="Bank Transfer" />
             <br /><br />
-            <h1 className="font-bold text-xl">ATTENTION: Only FROM Unidis Bank TO Unidis Bank</h1>
+            <h1 class="font-bold text-xl">ATTENTION: Only FROM Unidis Bank TO Unidis Bank</h1>
+            <br></br>
+            <h2 class="font-bold text-2xl">Money In Bank: RM{moneyInBank.toFixed(2)}</h2>
             <InputField
                 isShowTitle={true}
                 title="Amount"

@@ -171,22 +171,47 @@ app.post('/api/transfer', (req, res) => {
     const transactionType = 'transfer';
     const transactionDate = new Date().toISOString().split('T')[0];
 
-    const insertTransactionSql = `
-        INSERT INTO transactions (user_id, amount, transaction_type, transaction_date, target_name, target_account_number, bank_name)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    db.run(insertTransactionSql, [userId, amount, transactionType, transactionDate, recipientName, recipientAccountNumber, bankName], function (err) {
+    // Check if user has enough balance
+    const checkBalanceSql = `SELECT money_in_bank FROM users WHERE id = ?`;
+    db.get(checkBalanceSql, [userId], (err, row) => {
         if (err) {
-            console.error('Error inserting transaction:', err.message);
+            console.error('Error checking balance:', err.message);
             res.status(500).json({ error: 'Internal server error' });
             return;
         }
-        res.json({ message: 'Transaction successful', transactionId: this.lastID });
+
+        if (!row || row.money_in_bank < amount) {
+            res.status(400).json({ error: 'Insufficient funds' });
+            return;
+        }
+
+        // User has enough balance, proceed with transaction
+        const insertTransactionSql = `
+            INSERT INTO transactions (user_id, amount, transaction_type, transaction_date, target_name, target_account_number, bank_name)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        db.run(insertTransactionSql, [userId, amount, transactionType, transactionDate, recipientName, recipientAccountNumber, bankName], function (err) {
+            if (err) {
+                console.error('Error inserting transaction:', err.message);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+
+            // Subtract amount from user's balance
+            const updateBalanceSql = `UPDATE users SET money_in_bank = money_in_bank - ? WHERE id = ?`;
+            db.run(updateBalanceSql, [amount, userId], function (err) {
+                if (err) {
+                    console.error('Error updating balance:', err.message);
+                    res.status(500).json({ error: 'Internal server error' });
+                    return;
+                }
+
+                res.json({ message: 'Transaction successful', transactionId: this.lastID });
+            });
+        });
     });
 });
-
-
 
 // Start the server and listen on the specified port
 app.listen(port, () => {

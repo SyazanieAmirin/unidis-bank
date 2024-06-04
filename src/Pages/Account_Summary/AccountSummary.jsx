@@ -4,8 +4,9 @@ import TransactionBox from '../../Components/Global/TransactionBox';
 
 export default function AccountSummary() {
     const [username, setUsername] = useState('');
-
     const [accountNumber, setAccountNumber] = useState('');
+    const [moneyInBank, setMoneyInBank] = useState(0);
+
 
     useEffect(() => {
         const storedUsername = localStorage.getItem('username');
@@ -22,6 +23,8 @@ export default function AccountSummary() {
             .then(data => {
                 // Set the account number state
                 setAccountNumber(data.account_number);
+                setMoneyInBank(data.money_in_bank);
+
             })
             .catch(error => {
                 console.error('Error fetching user data:', error);
@@ -33,6 +36,7 @@ export default function AccountSummary() {
             <Header current_page={"Account Summary"} />
             <br></br><br></br>
             <h1>{accountNumber}</h1>
+            <h1 className="mt-2 font-bold text-2xl">RM{moneyInBank.toFixed(2)}</h1>
             <br></br>
             <TransactionBox title={"All Transactions"} userName={username} />
         </div>

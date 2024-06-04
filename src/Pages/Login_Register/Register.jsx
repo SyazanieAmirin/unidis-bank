@@ -8,7 +8,7 @@ export default function Register() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const navigate = useNavigate(); // Move useNavigate hook outside of the function
+    const navigate = useNavigate();
 
 
     const handleRegister = async (e) => {
