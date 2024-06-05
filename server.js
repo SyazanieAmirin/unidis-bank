@@ -421,6 +421,17 @@ app.get('/api/user/:id/money-in-bank', (req, res) => {
     });
 });
 
+// Route to handle fetching all goals
+app.get('/api/goals-info', (req, res) => {
+    const sql = 'SELECT * FROM goals';
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        res.json(rows);
+    });
+});
 
 // Start the server and listen on the specified port
 app.listen(port, () => {
