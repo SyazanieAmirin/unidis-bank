@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../Components/Global/Header';
 import GoalsBox from '../../Components/Pages_Based/Goals/GoalsBox';
@@ -6,27 +6,147 @@ import BigButton from '../../Components/Global/BigButton';
 
 export default function Goals() {
     const [goals, setGoals] = useState([]);
+    const [selectedGoal, setSelectedGoal] = useState(null);
+    const [transferAmount, setTransferAmount] = useState('');
+    const [moneyInBank, setMoneyInBank] = useState(0);
+    const [userId, setUserId] = useState(null); // To store the user ID
+    const [username, setUsername] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchGoals = async () => {
-            const username = localStorage.getItem('username');
-            if (username) {
-                try {
-                    const response = await fetch(`http://localhost:3001/api/userId/${username}`);
-                    const data = await response.json();
-                    const userId = data.id;
-                    const goalsResponse = await fetch(`http://localhost:3001/api/user/${userId}/goals`);
-                    const goalsData = await goalsResponse.json();
-                    setGoals(goalsData);
-                } catch (error) {
-                    console.error('Error fetching goals:', error);
+        const storedUsername = localStorage.getItem('username');
+        setUsername(storedUsername);
+
+        // Fetch user data from backend
+        fetch(`http://localhost:3001/api/users/${storedUsername}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
                 }
+                return response.json();
+            })
+            .then(data => {
+                // Set the account number and money in bank states
+                setMoneyInBank(data.money_in_bank);
+            })
+            .catch(error => {
+                console.error('Error fetching user data:', error);
+            });
+
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        const storedUsername = localStorage.getItem('username');
+        setUsername(storedUsername);
+
+        const fetchUserId = async () => {
+            try {
+                const response = await fetch(`http://localhost:3001/api/userId/${storedUsername}`);
+                const data = await response.json();
+                setUserId(data.id);
+            } catch (error) {
+                console.error('Error fetching user ID:', error);
             }
         };
 
-        fetchGoals();
+        if (storedUsername) {
+            fetchUserId();
+        }
     }, []);
+
+    const fetchData = async () => {
+        const username = localStorage.getItem('username');
+        setUsername(username);
+        if (username) {
+            try {
+                const response = await fetch(`http://localhost:3001/api/userId/${username}`);
+                const data = await response.json();
+                const userId = data.id;
+                const [goalsResponse] = await Promise.all([
+                    fetch(`http://localhost:3001/api/user/${userId}/goals`)
+                ]);
+                const [goalsData] = await Promise.all([
+                    goalsResponse.json()
+                ]);
+                setGoals(goalsData);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+    };
+
+    const handleGoalClick = (goal) => {
+        setSelectedGoal(goal);
+    };
+
+    const handleTransferAmountChange = (e) => {
+        setTransferAmount(e.target.value);
+    };
+
+    const handleTransferSubmit = async () => {
+        try {
+            // Get the real user ID
+            const storedUsername = localStorage.getItem('username');
+            const response = await fetch(`http://localhost:3001/api/users/${storedUsername}`);
+            const realUserId = userId.id;
+
+            console.log(realUserId)
+
+            // Update the selectedGoal with the correct user ID
+            const updatedSelectedGoal = { ...selectedGoal, user_Id: realUserId };
+
+            // Calculate updated current amount
+            const updatedCurrentAmount = updatedSelectedGoal.currentAmount + parseFloat(transferAmount);
+
+            // Update the selectedGoal's currentAmount in the frontend
+            const updatedGoals = goals.map(goal =>
+                goal.name === selectedGoal.name ? { ...goal, currentAmount: updatedCurrentAmount } : goal
+            );
+            setGoals(updatedGoals);
+
+            // Send an HTTP request to update the goal's currentAmount in the database
+            await fetch(`http://localhost:3001/api/goals/${selectedGoal.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ currentAmount: updatedCurrentAmount, transferAmount: parseFloat(transferAmount) }), // Include transferAmount
+            });
+
+
+            // Subtract the transferred amount from the money_in_bank of the user
+            const updatedMoneyInBank = moneyInBank - updatedCurrentAmount;
+            setMoneyInBank(updatedMoneyInBank);
+
+            // Send an HTTP request to update the money_in_bank of the user in the database
+            await fetch(`http://localhost:3001/api/users/${username}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ money_in_bank: updatedMoneyInBank }),
+            });
+
+
+            // Insert a "goal" transaction
+            await fetch(`http://localhost:3001/api/goal-transaction`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: realUserId,
+                    amount: parseFloat(transferAmount),
+                }),
+            });
+
+            setSelectedGoal(null);
+            setTransferAmount('');
+        } catch (error) {
+            console.error('Error transferring amount:', error);
+        }
+    };
 
     const handleAddNewGoalClick = () => {
         navigate('/goals/add-new-goal');
@@ -36,7 +156,7 @@ export default function Goals() {
         const rows = [];
         for (let i = 0; i < goals.length; i += 2) {
             rows.push(
-                <div key={i} className='flex flex-row justify-between gap-10 px-20'>
+                <div key={i} className='flex flex-row justify-between gap-10 px-20' onClick={() => handleGoalClick(goals[i])}>
                     <GoalsBox
                         goalsName={goals[i].name}
                         goalsCurrent={goals[i].currentAmount}
@@ -65,7 +185,29 @@ export default function Goals() {
                 {renderGoals()}
             </div>
             <br /><br />
+            {selectedGoal && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white p-8 rounded-md">
+                        <h2 className="font-bold mb-2">Transfer Money to {selectedGoal.name} Goal</h2>
+                        <p className="mb-4">Current amount: RM{selectedGoal && selectedGoal.currentAmount ? selectedGoal.currentAmount.toFixed(2) : '0.00'}</p>
+                        <p className='mb-4'>Money In Bank: RM{moneyInBank ? moneyInBank.toFixed(2) : 'N/A'}</p>
+
+                        <div className='flex flex-row gap-5'>
+                            <input
+                                type="number"
+                                placeholder="Enter amount to transfer"
+                                value={transferAmount}
+                                onChange={handleTransferAmountChange}
+                                className="border border-gray-300 rounded-md p-2"
+                            />
+                            <button onClick={handleTransferSubmit} className="bg-black text-white px-4 py-2 rounded-md">Transfer</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            <br /><br />
             <BigButton title="Add New Goal" onClick={handleAddNewGoalClick} />
         </div>
     );
+
 }
