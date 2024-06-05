@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
-import Header from '../../Components/Global/Header';
+
+import Header from "../../Components/Global/Header"
 import InputField from '../../Components/Global/InputField';
 import BigButton from '../../Components/Global/BigButton';
 
-export default function BankTransfer() {
+export default function BankTransferToOtherBanks() {
+
     const [amount, setAmount] = useState('');
     const [recipientName, setRecipientName] = useState('');
     const [recipientAccountNumber, setRecipientAccountNumber] = useState('');
-    const [userId, setUserId] = useState(null); // To store the user ID
     const [username, setUsername] = useState('');
     const [moneyInBank, setMoneyInBank] = useState(0);
-    const bankName = 'UNIDIS BANK'; // This is to send the bank name to the server
+    const [bankName, setBankName] = useState('');
+    const [userId, setUserId] = useState(null);
 
     useEffect(() => {
         const storedUsername = localStorage.getItem('username');
@@ -65,7 +67,7 @@ export default function BankTransfer() {
         };
 
         try {
-            const response = await fetch('http://localhost:3001/api/transfer', {
+            const response = await fetch('/api/userIdAndAdd/:name', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -88,9 +90,9 @@ export default function BankTransfer() {
 
     return (
         <div className="flex flex-col items-center py-5 w-full max-w-[1200px] m-auto">
-            <Header current_page="Bank Transfer" />
+            <Header current_page="Transfer to Other Banks" />
             <br /><br />
-            <h1 className="font-bold text-xl">ATTENTION: Only FROM Unidis Bank TO Unidis Bank</h1>
+            <h1 className="font-bold text-xl">ATTENTION: Only FROM Unidis Bank TO Non-Unidis Bank</h1>
             <br></br>
             <h2 className="font-bold text-2xl">Money In Bank: RM{moneyInBank.toFixed(2)}</h2>
             <InputField
@@ -122,12 +124,15 @@ export default function BankTransfer() {
             <InputField
                 isShowTitle={true}
                 title="Bank Name"
-                placeholder="Unidis Bank"
-                type="disabled"
-                readOnly
+                placeholder="Put the bank name here. E.g. Maybank, CIMB, etc."
+                type="text"
+                value={bankName}
+                onChange={(e) => setBankName(e.target.value.toUpperCase())}
             />
             <br /><br />
             <BigButton title="Transfer" onClick={handleTransfer} />
         </div>
-    );
+    )
 }
+
+// TAK SIAP LAGI. PART TUKAR NI WITH SERVER JS PUNYA NEW API

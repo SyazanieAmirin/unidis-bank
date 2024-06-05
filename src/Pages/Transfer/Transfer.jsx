@@ -4,10 +4,10 @@ import Header from '../../Components/Global/Header';
 
 const Transfer = () => {
   const transferOptions = [
-    { id: 1, name: 'Bank Transfer', icon: '', link: '/transfer/bank-transfer' },
+    { id: 1, name: 'Bank Transfer (Unidis TO Unidis)', icon: '', link: '/transfer/bank-transfer' },
     { id: 2, name: 'DuitNow (QR)', icon: '', link: '/transfer/duitnow' },
-    { id: 3, name: 'Bank Transfer', icon: '', link: '/transfer/bank-transfer' },
-    { id: 4, name: 'Bank Transfer', icon: '', link: '/transfer/bank-transfer' },
+    { id: 3, name: 'Bank Transfer (Unidis TO Other Banks)', icon: '', link: '/transfer/bank-transfer-to-other-banks' },
+    { id: 4, name: 'Withdraw from ATM Online', icon: '', link: '/transfer/withdraw-atm-online' },
   ];
 
   return (

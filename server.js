@@ -213,6 +213,35 @@ app.post('/api/transfer', (req, res) => {
     });
 });
 
+// Route to handle fetching user ID by name and adding an amount
+app.get('/api/userIdAndAdd/:name', (req, res) => {
+    const userName = req.params.name;
+    const amountToAdd = req.query.amountToAdd; // Get the amount from the query parameters
+
+    if (!amountToAdd) {
+        res.status(400).json({ error: 'Amount to add is required' });
+        return;
+    }
+
+    const sql = 'SELECT id FROM users WHERE name = ?';
+    db.get(sql, [userName], (err, row) => {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        if (row) {
+            // Perform the logic to add the amount to the user's account here
+            // For example, update the money_in_bank column
+            // ...
+
+            res.json({ userId: row.id, message: 'Amount added successfully' });
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    });
+});
+
+
 // Start the server and listen on the specified port
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
