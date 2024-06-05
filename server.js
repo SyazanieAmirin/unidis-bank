@@ -314,53 +314,73 @@ app.post('/api/withdraw', (req, res) => {
 // Route to handle updating the currentAmount of a goal and subtracting from money_in_bank
 app.put('/api/goals/:id', (req, res) => {
     const { id } = req.params;
-    const { currentAmount, transferAmount } = req.body; // Extract transferAmount from request body
+    const { currentAmount, transferAmount } = req.body;
 
     if (!id || !currentAmount || isNaN(currentAmount) || parseFloat(currentAmount) < 0 || !transferAmount || isNaN(transferAmount) || parseFloat(transferAmount) < 0) {
         res.status(400).json({ error: 'Invalid goal ID or amount' });
         return;
     }
 
-    const updateGoalSql = `
-        UPDATE goals SET currentAmount = ?
-        WHERE id = ?
+    const getUserSql = `
+        SELECT users.money_in_bank
+        FROM users
+        INNER JOIN goals ON users.id = goals.user_id
+        WHERE goals.id = ?
     `;
 
-    const subtractAmountSql = `
-        UPDATE users 
-        SET money_in_bank = money_in_bank - ?
-        WHERE id = (
-            SELECT user_id FROM goals WHERE id = ?
-        )
-    `;
-
-    db.run(updateGoalSql, [currentAmount, id], function (err) {
+    db.get(getUserSql, [id], (err, row) => {
         if (err) {
-            console.error('Error updating goal:', err.message);
+            console.error('Error fetching user data:', err.message);
             res.status(500).json({ error: 'Internal server error' });
             return;
         }
 
-        db.run(subtractAmountSql, [transferAmount, id], function (err) { // Use transferAmount here
+        if (!row || row.money_in_bank < parseFloat(transferAmount)) {
+            res.status(400).json({ error: 'Insufficient funds' });
+            return;
+        }
+
+        const updateGoalSql = `
+            UPDATE goals SET currentAmount = ?
+            WHERE id = ?
+        `;
+
+        const subtractAmountSql = `
+            UPDATE users 
+            SET money_in_bank = money_in_bank - ?
+            WHERE id = (
+                SELECT user_id FROM goals WHERE id = ?
+            )
+        `;
+
+        db.run(updateGoalSql, [currentAmount, id], function (err) {
             if (err) {
-                console.error('Error subtracting amount from money_in_bank:', err.message);
+                console.error('Error updating goal:', err.message);
                 res.status(500).json({ error: 'Internal server error' });
                 return;
             }
 
-            res.json({ message: 'Goal updated successfully and money subtracted from money_in_bank', goalId: id });
+            db.run(subtractAmountSql, [transferAmount, id], function (err) {
+                if (err) {
+                    console.error('Error subtracting amount from money_in_bank:', err.message);
+                    res.status(500).json({ error: 'Internal server error' });
+                    return;
+                }
+
+                res.json({ message: 'Goal updated successfully and money subtracted from money_in_bank', goalId: id });
+            });
         });
     });
 });
 
-
-
-// Route to handle adding a new goal transaction
 app.post('/api/goal-transaction', (req, res) => {
-    const { userId, amount } = req.body;
+    const { userId, amount, targetName, targetAccountNumber, bankName } = req.body;
+
+    console.log('Received transaction data:', req.body); // Log the received data
 
     // Validate user ID and amount
     if (!userId || !amount || isNaN(amount) || parseFloat(amount) <= 0) {
+        console.error('Invalid user ID or amount');
         return res.status(400).json({ error: 'Invalid user ID or amount' });
     }
 
@@ -369,12 +389,12 @@ app.post('/api/goal-transaction', (req, res) => {
 
     // Insert the goal transaction
     const insertTransactionSql = `
-        INSERT INTO transactions (user_id, amount, transaction_type, transaction_date)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO transactions (user_id, amount, transaction_type, transaction_date, target_name, target_account_number, bank_name)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
     // Execute the SQL query
-    db.run(insertTransactionSql, [userId, amount, transactionType, transactionDate], function (err) {
+    db.run(insertTransactionSql, [userId, amount, transactionType, transactionDate, targetName, targetAccountNumber, bankName], function (err) {
         if (err) {
             console.error('Error inserting goal transaction:', err.message);
             return res.status(500).json({ error: 'Internal server error' });
@@ -383,7 +403,6 @@ app.post('/api/goal-transaction', (req, res) => {
         res.json({ message: 'Goal transaction successful', transactionId: this.lastID });
     });
 });
-
 
 // Route to handle fetching user's money in the bank by ID
 app.get('/api/user/:id/money-in-bank', (req, res) => {

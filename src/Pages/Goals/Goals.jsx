@@ -85,13 +85,17 @@ export default function Goals() {
     };
 
     const handleTransferSubmit = async () => {
+        // Check if transferAmount exceeds moneyInBank
+        if (parseFloat(transferAmount) > moneyInBank) {
+            alert('Transfer amount exceeds available bank balance.');
+            return;
+        }
+
         try {
             // Get the real user ID
-            const storedUsername = localStorage.getItem('username');
-            const response = await fetch(`http://localhost:3001/api/users/${storedUsername}`);
-            const realUserId = userId.id;
-
-            console.log(realUserId)
+            const response = await fetch(`http://localhost:3001/api/userId/${username}`);
+            const data = await response.json();
+            const realUserId = data.id;
 
             // Update the selectedGoal with the correct user ID
             const updatedSelectedGoal = { ...selectedGoal, user_Id: realUserId };
@@ -114,9 +118,8 @@ export default function Goals() {
                 body: JSON.stringify({ currentAmount: updatedCurrentAmount, transferAmount: parseFloat(transferAmount) }), // Include transferAmount
             });
 
-
             // Subtract the transferred amount from the money_in_bank of the user
-            const updatedMoneyInBank = moneyInBank - updatedCurrentAmount;
+            const updatedMoneyInBank = moneyInBank - parseFloat(transferAmount);
             setMoneyInBank(updatedMoneyInBank);
 
             // Send an HTTP request to update the money_in_bank of the user in the database
@@ -128,18 +131,28 @@ export default function Goals() {
                 body: JSON.stringify({ money_in_bank: updatedMoneyInBank }),
             });
 
+            // Prepare transaction data
+            const transactionData = {
+                userId: realUserId,
+                amount: parseFloat(transferAmount),
+                targetName: selectedGoal.name, // Assuming the goal name is the target name
+                targetAccountNumber: 'N/A', // Update accordingly if you have target account info
+                bankName: 'N/A' // Update accordingly if you have bank info
+            };
+
+            console.log('Sending transaction data:', transactionData); // Log the transaction data
 
             // Insert a "goal" transaction
-            await fetch(`http://localhost:3001/api/goal-transaction`, {
+            const transactionResponse = await fetch(`http://localhost:3001/api/goal-transaction`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    userId: realUserId,
-                    amount: parseFloat(transferAmount),
-                }),
+                body: JSON.stringify(transactionData),
             });
+
+            const transactionResult = await transactionResponse.json();
+            console.log('Transaction result:', transactionResult); // Log the result
 
             setSelectedGoal(null);
             setTransferAmount('');
@@ -148,8 +161,13 @@ export default function Goals() {
         }
     };
 
+
     const handleAddNewGoalClick = () => {
         navigate('/goals/add-new-goal');
+    };
+
+    const handleClosePopup = () => {
+        setSelectedGoal(null);
     };
 
     const renderGoals = () => {
@@ -187,7 +205,13 @@ export default function Goals() {
             <br /><br />
             {selectedGoal && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white p-8 rounded-md">
+                    <div className="bg-white p-8 rounded-md relative">
+                        <button
+                            onClick={handleClosePopup}
+                            className="absolute top-2 right-5 text-4xl transition-all hover:scale-90"
+                        >
+                            &times;
+                        </button>
                         <h2 className="font-bold mb-2">Transfer Money to {selectedGoal.name} Goal</h2>
                         <p className="mb-4">Current amount: RM{selectedGoal && selectedGoal.currentAmount ? selectedGoal.currentAmount.toFixed(2) : '0.00'}</p>
                         <p className='mb-4'>Money In Bank: RM{moneyInBank ? moneyInBank.toFixed(2) : 'N/A'}</p>
@@ -198,9 +222,9 @@ export default function Goals() {
                                 placeholder="Enter amount to transfer"
                                 value={transferAmount}
                                 onChange={handleTransferAmountChange}
-                                className="border border-gray-300 rounded-md p-2"
+                                className="border bg-black text-white rounded-full p-3"
                             />
-                            <button onClick={handleTransferSubmit} className="bg-black text-white px-4 py-2 rounded-md">Transfer</button>
+                            <button onClick={handleTransferSubmit} className="bg-black text-white px-4 py-2 rounded-full transition-all hover:scale-90">Transfer</button>
                         </div>
                     </div>
                 </div>
