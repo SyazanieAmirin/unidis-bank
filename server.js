@@ -213,33 +213,86 @@ app.post('/api/transfer', (req, res) => {
     });
 });
 
-// Route to handle fetching user ID by name and adding an amount
-app.get('/api/userIdAndAdd/:name', (req, res) => {
-    const userName = req.params.name;
-    const amountToAdd = req.query.amountToAdd; // Get the amount from the query parameters
+// Route to handle adding a new goal
+app.post('/api/goals', (req, res) => {
+    const { name, targetAmount, currentAmount = 0, userId } = req.body;
 
-    if (!amountToAdd) {
-        res.status(400).json({ error: 'Amount to add is required' });
+    if (!name || targetAmount == null || !userId) {
+        res.status(400).json({ error: 'Name, target amount, and user ID are required' });
         return;
     }
 
-    const sql = 'SELECT id FROM users WHERE name = ?';
-    db.get(sql, [userName], (err, row) => {
+    const insertGoalSql = 'INSERT INTO goals (name, targetAmount, currentAmount, user_id) VALUES (?, ?, ?, ?)';
+    db.run(insertGoalSql, [name, targetAmount, currentAmount, userId], function (err) {
+        if (err) {
+            console.error('Error inserting into database:', err.message);
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+        }
+        res.json({ message: 'Goal added successfully', id: this.lastID });
+    });
+});
+
+// Route to handle fetching all goals for a specific user
+app.get('/api/user/:id/goals', (req, res) => {
+    const userId = req.params.id;
+    const sql = 'SELECT * FROM goals WHERE user_id = ?';
+    db.all(sql, [userId], (err, rows) => {
         if (err) {
             res.status(400).json({ error: err.message });
             return;
         }
-        if (row) {
-            // Perform the logic to add the amount to the user's account here
-            // For example, update the money_in_bank column
-            // ...
-
-            res.json({ userId: row.id, message: 'Amount added successfully' });
+        if (rows.length > 0) {
+            res.json(rows);
         } else {
-            res.status(404).json({ error: 'User not found' });
+            res.status(404).json({ error: 'No goals found for this user' });
         }
     });
 });
+
+// Route to handle withdrawals
+app.post('/api/withdraw', (req, res) => {
+    const { userId, amount } = req.body;
+
+    if (!userId || !amount || isNaN(amount) || parseFloat(amount) <= 0) {
+        res.status(400).json({ error: 'Invalid user ID or amount' });
+        return;
+    }
+
+    const transactionType = 'withdraw';
+    const transactionDate = new Date().toISOString().split('T')[0];
+
+    // Add the withdrawn amount to the user's money_in_bank
+    const updateMoneyInBankSql = `
+        UPDATE users SET money_in_bank = money_in_bank + ?
+        WHERE id = ?
+    `;
+
+    db.run(updateMoneyInBankSql, [amount, userId], function (err) {
+        if (err) {
+            console.error('Error updating money_in_bank:', err.message);
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+        }
+
+        // Insert a withdrawal transaction
+        const insertTransactionSql = `
+            INSERT INTO transactions (user_id, amount, transaction_type, transaction_date, target_name, target_account_number, bank_name)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        db.run(insertTransactionSql, [userId, amount, transactionType, transactionDate, 'Self', 'N/A', 'N/A'], function (err) {
+            if (err) {
+                console.error('Error inserting withdrawal transaction:', err.message);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+
+            res.json({ message: 'Withdrawal successful', transactionId: this.lastID });
+        });
+    });
+});
+
 
 
 // Start the server and listen on the specified port

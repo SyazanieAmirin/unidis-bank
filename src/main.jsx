@@ -15,6 +15,7 @@ import BankTransferToOtherBanks from './Pages/Transfer/BankTransferToOtherBanks'
 import WithdrawATMOnline from './Pages/Transfer/WithdrawATMOnline';
 
 import Goals from './Pages/Goals/Goals';
+import AddNewGoal from './Pages/Goals/AddNewGoal';
 
 const routes = [
   { path: '/', element: <Login /> },
@@ -27,6 +28,7 @@ const routes = [
   { path: '/transfer/bank-transfer-to-other-banks', element: <BankTransferToOtherBanks /> },
   { path: '/transfer/withdraw-atm-online', element: <WithdrawATMOnline /> },
   { path: '/goals', element: <Goals /> },
+  { path: '/goals/add-new-goal', element: <AddNewGoal /> }
 
 ];
 

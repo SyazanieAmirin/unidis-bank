@@ -27,7 +27,7 @@ export default function TransactionBox({ title, userName }) {
     return (
         <>
 
-            <div className="bg-black h-auto w-1/2 rounded-md flex flex-col px-7 py-4 gap-3 max-h-96 overflow-y-auto">
+            <div className="bg-black h-auto w-1/2 rounded-md flex flex-col px-7 py-4 gap-3 max-h-[700px] overflow-y-auto">
                 <h1 className="font-bold text-white">{title}</h1>
                 {transactions.length > 0 ? (
                     transactions.map((transaction) => (

@@ -47,8 +47,51 @@ export default function WithdrawATMOnline() {
         }
     }, []);
 
-    const handleWithdraw = () => {
-        console.log('Withdraw button clicked');
+    const handleWithdraw = async () => {
+        if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+            console.error('Invalid withdrawal amount');
+            return;
+        }
+
+        try {
+            // Update the user's money_in_bank
+            const updatedMoneyInBank = moneyInBank + parseFloat(amount);
+            setMoneyInBank(updatedMoneyInBank);
+
+            // Update the user's money_in_bank in the database
+            await fetch(`http://localhost:3001/api/users/${username}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ money_in_bank: updatedMoneyInBank }),
+            });
+
+            // Insert a withdrawal transaction
+            const withdrawalData = {
+                userId,
+                amount: parseFloat(amount),
+                recipientName: 'SELF',
+                recipientAccountNumber: 'N/A',
+                bankName: 'UNIDIS BANK',
+            };
+
+            await fetch('http://localhost:3001/api/withdraw', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(withdrawalData),
+            });
+
+            // Reset the amount field
+            setAmount('');
+            console.log('Withdrawal successful');
+        } catch (error) {
+            console.error('Error processing withdrawal:', error);
+            // Rollback the money_in_bank update if there's an error
+            setMoneyInBank(moneyInBank);
+        }
     };
 
     return (
