@@ -16,7 +16,6 @@ export default function Goals() {
                 </div>
                 <div className='flex flex-row justify-between gap-10 px-20'>
                     <GoalsBox goalsName={"Test Goal Name"} goalsCurrent={5000} goalsTarget={10000} />
-                    <GoalsBox goalsName={"Test Goal Name"} goalsCurrent={5000} goalsTarget={10000} />
                 </div>
             </div>
         </div>
