@@ -17,6 +17,8 @@ import WithdrawATMOnline from './Pages/Transfer/WithdrawATMOnline';
 import Goals from './Pages/Goals/Goals';
 import AddNewGoal from './Pages/Goals/AddNewGoal';
 
+import Statistics from './Pages/Statistics/Statistics';
+
 const routes = [
   { path: '/', element: <Login /> },
   { path: '/register', element: <Register /> },
@@ -28,7 +30,8 @@ const routes = [
   { path: '/transfer/bank-transfer-to-other-banks', element: <BankTransferToOtherBanks /> },
   { path: '/transfer/withdraw-atm-online', element: <WithdrawATMOnline /> },
   { path: '/goals', element: <Goals /> },
-  { path: '/goals/add-new-goal', element: <AddNewGoal /> }
+  { path: '/goals/add-new-goal', element: <AddNewGoal /> },
+  { path: '/statistics', element: <Statistics /> }
 
 ];
 
