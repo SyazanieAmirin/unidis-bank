@@ -7,7 +7,7 @@ import MediumButton from "../../Components/Global/MediumButton";
 export default function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const navigate = useNavigate(); // Move useNavigate hook outside of the function
+    const navigate = useNavigate(); // Move useNavigate hook outside of the functiona
 
     const handleLogin = async (e) => {
         e.preventDefault();

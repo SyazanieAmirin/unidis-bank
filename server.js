@@ -1,3 +1,4 @@
+import path from 'path';
 import express from 'express';
 import fs from 'fs';
 import sqlite3 from 'sqlite3';
@@ -12,6 +13,14 @@ app.use(bodyParser.json());
 
 // Enable CORS
 app.use(cors());
+
+// Serve static files from the dist directory
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// Fallback to serve the index.html on all routes (for client-side routing)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 
 // Path to the db
 const dbPath = "./src/Database/unidis-bank.db";
