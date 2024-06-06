@@ -18,7 +18,7 @@ export default function Goals() {
         setUsername(storedUsername);
 
         // Fetch user data from backend
-        fetch(`http://localhost:3001/api/users/${storedUsername}`)
+        fetch(`http://https://unidis-bank.onrender.com/api/users/${storedUsername}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -42,7 +42,7 @@ export default function Goals() {
 
         const fetchUserId = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/userId/${storedUsername}`);
+                const response = await fetch(`http://https://unidis-bank.onrender.com/api/userId/${storedUsername}`);
                 const data = await response.json();
                 setUserId(data.id);
             } catch (error) {
@@ -60,11 +60,11 @@ export default function Goals() {
         setUsername(username);
         if (username) {
             try {
-                const response = await fetch(`http://localhost:3001/api/userId/${username}`);
+                const response = await fetch(`http://https://unidis-bank.onrender.com/api/userId/${username}`);
                 const data = await response.json();
                 const userId = data.id;
                 const [goalsResponse] = await Promise.all([
-                    fetch(`http://localhost:3001/api/user/${userId}/goals`)
+                    fetch(`http://https://unidis-bank.onrender.com/api/user/${userId}/goals`)
                 ]);
                 const [goalsData] = await Promise.all([
                     goalsResponse.json()
@@ -93,7 +93,7 @@ export default function Goals() {
 
         try {
             // Get the real user ID
-            const response = await fetch(`http://localhost:3001/api/userId/${username}`);
+            const response = await fetch(`http://https://unidis-bank.onrender.com/api/userId/${username}`);
             const data = await response.json();
             const realUserId = data.id;
 
@@ -110,7 +110,7 @@ export default function Goals() {
             setGoals(updatedGoals);
 
             // Send an HTTP request to update the goal's currentAmount in the database
-            await fetch(`http://localhost:3001/api/goals/${selectedGoal.id}`, {
+            await fetch(`http://https://unidis-bank.onrender.com/api/goals/${selectedGoal.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -123,7 +123,7 @@ export default function Goals() {
             setMoneyInBank(updatedMoneyInBank);
 
             // Send an HTTP request to update the money_in_bank of the user in the database
-            await fetch(`http://localhost:3001/api/users/${username}`, {
+            await fetch(`http://https://unidis-bank.onrender.com/api/users/${username}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -143,7 +143,7 @@ export default function Goals() {
             console.log('Sending transaction data:', transactionData); // Log the transaction data
 
             // Insert a "goal" transaction
-            const transactionResponse = await fetch(`http://localhost:3001/api/goal-transaction`, {
+            const transactionResponse = await fetch(`http://https://unidis-bank.onrender.com/api/goal-transaction`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

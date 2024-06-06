@@ -7,12 +7,12 @@ export default function RecentTransactionsBox({ title, userName }) {
         const fetchTransactions = async () => {
             try {
                 // Get user ID by userName
-                const userIdResponse = await fetch(`http://localhost:3001/api/userId/${userName}`);
+                const userIdResponse = await fetch(`http://https://unidis-bank.onrender.com/api/userId/${userName}`);
                 const userIdData = await userIdResponse.json();
                 const userId = userIdData.id;
 
                 // Get transactions by userId
-                const transactionsResponse = await fetch(`http://localhost:3001/api/user/${userId}/transactions`);
+                const transactionsResponse = await fetch(`http://https://unidis-bank.onrender.com/api/user/${userId}/transactions`);
                 const transactionsData = await transactionsResponse.json();
 
                 // Sort transactions by date and slice to get the 5 most recent transactions

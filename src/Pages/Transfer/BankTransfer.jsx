@@ -18,7 +18,7 @@ export default function BankTransfer() {
 
         const fetchUserId = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/userId/${storedUsername}`);
+                const response = await fetch(`http://https://unidis-bank.onrender.com/api/userId/${storedUsername}`);
                 const data = await response.json();
                 setUserId(data.id);
             } catch (error) {
@@ -37,7 +37,7 @@ export default function BankTransfer() {
 
         const fetchUserId = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/users/${storedUsername}`);
+                const response = await fetch(`http://https://unidis-bank.onrender.com/api/users/${storedUsername}`);
                 const data = await response.json();
                 setMoneyInBank(data.money_in_bank);
             } catch (error) {
@@ -65,7 +65,7 @@ export default function BankTransfer() {
         };
 
         try {
-            const response = await fetch('http://localhost:3001/api/transfer', {
+            const response = await fetch('http://https://unidis-bank.onrender.com/api/transfer', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

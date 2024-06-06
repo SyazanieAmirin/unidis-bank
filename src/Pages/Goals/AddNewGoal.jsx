@@ -14,7 +14,7 @@ export default function AddNewGoal() {
         // Fetch the current user ID using the user's name from localStorage
         const userName = localStorage.getItem('username'); // Assuming the user name is stored in localStorage
         if (userName) {
-            fetch(`http://localhost:3001/api/userId/${userName}`)
+            fetch(`http://https://unidis-bank.onrender.com/api/userId/${userName}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.id) {
@@ -42,7 +42,7 @@ export default function AddNewGoal() {
             userId
         };
 
-        fetch('http://localhost:3001/api/goals', {
+        fetch('http://https://unidis-bank.onrender.com/api/goals', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
