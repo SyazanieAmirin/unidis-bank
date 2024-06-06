@@ -13,7 +13,7 @@ export default function AccountSummary() {
         setUsername(storedUsername);
 
         // Fetch user data from backend
-        fetch(`http://https://unidis-bank.onrender.com/api/users/${storedUsername}`)
+        fetch(`https://unidis-bank.onrender.com/api/users/${storedUsername}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');

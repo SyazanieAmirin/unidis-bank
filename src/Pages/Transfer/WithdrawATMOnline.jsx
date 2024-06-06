@@ -15,7 +15,7 @@ export default function WithdrawATMOnline() {
 
         const fetchUserId = async () => {
             try {
-                const response = await fetch(`http://https://unidis-bank.onrender.com/api/userId/${storedUsername}`);
+                const response = await fetch(`https://unidis-bank.onrender.com/api/userId/${storedUsername}`);
                 const data = await response.json();
                 setUserId(data.id);
             } catch (error) {
@@ -34,7 +34,7 @@ export default function WithdrawATMOnline() {
 
         const fetchUserMoney = async () => {
             try {
-                const response = await fetch(`http://https://unidis-bank.onrender.com/api/users/${storedUsername}`);
+                const response = await fetch(`https://unidis-bank.onrender.com/api/users/${storedUsername}`);
                 const data = await response.json();
                 setMoneyInBank(data.money_in_bank);
             } catch (error) {
@@ -59,7 +59,7 @@ export default function WithdrawATMOnline() {
             setMoneyInBank(updatedMoneyInBank);
 
             // Update the user's money_in_bank in the database
-            await fetch(`http://https://unidis-bank.onrender.com/api/users/${username}`, {
+            await fetch(`https://unidis-bank.onrender.com/api/users/${username}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ export default function WithdrawATMOnline() {
                 bankName: 'UNIDIS BANK',
             };
 
-            await fetch('http://https://unidis-bank.onrender.com/api/withdraw', {
+            await fetch('https://unidis-bank.onrender.com/api/withdraw', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

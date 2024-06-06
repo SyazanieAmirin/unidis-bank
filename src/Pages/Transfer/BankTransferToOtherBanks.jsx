@@ -20,7 +20,7 @@ export default function BankTransferToOtherBanks() {
 
         const fetchUserId = async () => {
             try {
-                const response = await fetch(`http://https://unidis-bank.onrender.com/api/userId/${storedUsername}`);
+                const response = await fetch(`https://unidis-bank.onrender.com/api/userId/${storedUsername}`);
                 const data = await response.json();
                 setUserId(data.id);
             } catch (error) {
@@ -39,7 +39,7 @@ export default function BankTransferToOtherBanks() {
 
         const fetchUserId = async () => {
             try {
-                const response = await fetch(`http://https://unidis-bank.onrender.com/api/users/${storedUsername}`);
+                const response = await fetch(`https://unidis-bank.onrender.com/api/users/${storedUsername}`);
                 const data = await response.json();
                 setMoneyInBank(data.money_in_bank);
             } catch (error) {
